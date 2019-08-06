@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block quiz %}
+<div>
+	<h1>{{quiz.title}}</h1>
+	<div class="counter-box">Score: <span class="counter">0</span>/{{ quiz.total }}</div>
+	{% for problem_set in quiz.problem_sets %}
+	<fieldset>
+		<legend>{{problem_set.title}}</legend>
+		<div class="intro">{{problem_set.intro}}</div>
+		{% for question in problem_set.questions %}
+		<hr/>
+		<div>
+			<div class="description">{{question.description}}</div>
+
+			{% if question.multiple %}
+			<div class="mcq">
+				{% for option in question.options %}
+				<label>
+					<input type="checkbox" autocomplete="off"/>
+					<span class="multiple-selection">{{option.description}}</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					{% if option.correct %}
+					<div class="response right"></div>
+					{% else %}
+					<div class="response wrong"></div>
+					{% endif %}
+				</label>
+				{% endfor %}
+
+				<button>Submit</button>
+				<div class="response explanation">
+					<strong>Explanation</strong>
+					<br>
+					<p>{{question.explanation}}</p>
+				</div>
+			</div>
+			{% else %}
+			<div class="scq">
+				{% for option in question.options %}
+				<label>
+					<input type="radio" class="selection" name="question" autocomplete="off"/>
+					<span class="multiple-selection">{{option.description}}</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					{% if option.correct %}
+					<div class="response right"></div>
+					{% else %}
+					<div class="response wrong"></div>
+					{% endif %}
+					<br>
+				</label>
+				{% endfor %}
+
+				<button>Submit</button>
+				<div class="response explanation">
+					<strong>Explanation</strong>
+					<br>
+					<p>{{question.explanation}}</p>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		{% endfor %}
+	</fieldset>
+	<br/>
+	{% endfor %}
+</div>
+{% endblock %}

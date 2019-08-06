@@ -1,0 +1,55 @@
+{
+  "title": "Sample quiz",
+  "problem_sets": [
+    {
+      "title": "Problem set 1",
+      "intro": "Intro to problem set 1",
+      "questions": [
+        {
+          "multiple": false,
+          "description": "How many legs does a dog have?",
+          "options": [
+            {
+              "description": "1",
+              "correct": false
+            },
+            {
+              "description": "2",
+              "correct": false
+            },
+            {
+              "description": "3",
+              "correct": false
+            },
+            {
+              "description": "4",
+              "correct": true
+            }
+          ]
+        },
+        {
+          "multiple": true,
+          "description": "Which of these drinks are served hot?",
+          "options": [
+            {
+              "description": "Tea",
+              "correct": true
+            },
+            {
+              "description": "Coffee",
+              "correct": true
+            },
+            {
+              "description": "Lemonade",
+              "correct": false
+            },
+            {
+              "description": "Cola",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

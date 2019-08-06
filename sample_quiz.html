@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quiz</title>
+    <link href='http://fonts.googleapis.com/css?family=Josefin+Sans|Alike' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="quiz.css" type="text/css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          processEscapes: true
+        }
+      });
+    </script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.2/styles/default.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.2/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <style>
+      html {
+        min-height: 100%;
+      }
+      body {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        font-family: 'PT Sans', 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+        font-size: 16px;
+        position: relative;
+        min-height: 100%;
+        width: 680px;
+        background-color: rgb(250, 250, 250);
+        color: #333;
+      }
+      img {
+        height: 400px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+      }
+      div .description {
+        margin-top: 30px;
+      }
+      a {
+        color: #000066;
+      }
+      div .selection {
+        color: #000066;
+        text-decoration: none;
+      }
+      div .selection:hover {
+        text-decoration: underline;
+      }
+      span.right {
+        color:#008800;
+      }
+      hr {
+        width: 60%;
+        margin-left: 0px;
+        border: 0px;
+        border-bottom: 1px solid #ccc;
+      }
+      fieldset {
+        border: 0px;
+        border-bottom: 2.5px solid #aaa;
+        padding: 10px 20px;
+        padding-left: 0px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+      ol ul {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      .selection {
+        cursor: pointer;
+        margin-top: 5px;
+      }
+      .multiple-selection {
+        cursor: pointer;
+        margin-top: 5px;
+      }
+      .correct-checkbox {
+        color: #4F8A10;
+        display: none;
+      }
+      .incorrect-checkbox {
+        color: #D8000C;
+        display: none;
+      }
+      legend {
+        font-family: Alike, 'Josefin Sans';
+        font-size: 19px;
+        padding-left: 0px;
+      }
+      .response.wrong{
+        padding: 8px 10px;
+        color: #D8000C;
+        background-color: #FFBABA;
+        margin: 10px 0px;
+      }
+
+      .response.right{
+        padding: 8px 10px;
+        color: #4F8A10;
+        background-color: #DFF2BF;
+        margin: 10px 0px;
+      }
+      footer {
+        font-size: 12px;
+        margin-top: 0px;
+        margin-bottom: 5px;
+        bottom: 0;
+        width: 100%;
+      }
+      label {
+        display: block;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+      button {
+        background: #bbb;
+        border: 0px;
+        color: #ffffff;
+        font-size: 14px;
+        padding: 6px 12px 6px 12px;
+        text-decoration: none;
+      }
+      button:hover{
+        background: #ccc;
+      }
+      button:focus {
+          outline: none;
+      }
+      .counter-box {
+        padding: 8px 10px;
+        color: #197699;
+        background-color: #7FC9E5;
+        position : fixed;
+        top      : 0px;
+        left    : 0px;
+      }
+
+    </style>
+
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+      //close all the content divs on page load
+      $('.response').hide();
+
+      var $counter = $('.counter')
+
+      $('button').click(function(event){
+        var $target = $(event.target);
+        var $checkboxes = $target.parent('.mcq').find('input');
+        var $radios = $target.parent('.scq').find('input');
+        var $radios_explanation = $target.parent('.scq').find('.explanation')
+        var $checkbox_explanation = $target.parent('.mcq').find('.explanation')
+
+        for (var i = 0; i < $checkboxes.length; i++) {
+          var $checkbox = $checkboxes.eq(i);
+          if ($checkbox[0].checked && $checkbox.nextAll('.response').hasClass('right')) {
+            $checkbox.nextAll('.correct-checkbox').show();
+          } else if ($checkbox[0].checked &&
+              $checkbox.nextAll('.response').hasClass('wrong')) {
+            $checkbox.nextAll('.incorrect-checkbox').show();
+          } else if (!$checkbox[0].checked &&
+              $checkbox.nextAll('.response').hasClass('right')) {
+            $checkbox.nextAll('.incorrect-checkbox').show();
+          }
+        }
+
+        for (var i = 0; i < $radios.length; i++) {
+          var $radio = $radios.eq(i);
+          if ($radio.nextAll('.response').hasClass('right')) {
+            $radio.nextAll('.correct-checkbox').show();
+          } else if ($radio[0].checked &&
+              $radio.nextAll('.response').hasClass('wrong')) {
+            $radio.nextAll('.incorrect-checkbox').show();
+          }
+        }
+
+        function radioCorrect()  {
+          for (var i = 0; i < $radios.length; i++) {
+            var $radio = $radios.eq(i);
+            a = $radio;
+            if ($radio[0].checked && $radio.nextAll('.response').hasClass('right')) {
+              return true
+            }
+          }
+          return false
+        }
+
+        function checkboxCorrect() {
+          for (var i = 0; i < $checkboxes.length; i++) {
+            var $checkbox = $checkboxes.eq(i);
+            if ($checkbox[0].checked &&  $checkbox.nextAll('.response').hasClass('wrong')) {
+              return false
+            } else if (!$checkbox[0].checked && $checkbox.nextAll('.response').hasClass('right')) {
+              return false
+            }
+          }
+          return true
+        }
+
+        function updateQuestion() {
+          if ($checkboxes.length > 0) {
+            if (checkboxCorrect()){
+              $checkbox_explanation.removeClass("wrong")
+              $checkbox_explanation.addClass("right")
+              $checkbox_explanation.show()
+              $counter.text(parseInt($counter.text())+1)
+            } else {
+              $checkbox_explanation.removeClass("right")
+              $checkbox_explanation.addClass("wrong")
+              $checkbox_explanation.show()
+            }
+          } else {
+            if (radioCorrect()){
+              $radios_explanation.removeClass("wrong")
+              $radios_explanation.addClass("right")
+              $radios_explanation.show()
+              console.log($checkboxes.length)
+              console.log($radios.length)
+              $counter.text(parseInt($counter.text())+1)
+            } else {
+              $radios_explanation.removeClass("right")
+              $radios_explanation.addClass("wrong")
+              $radios_explanation.show()
+            }
+          }
+        }
+
+        updateQuestion()
+        $target.hide();
+
+      });
+    });
+    </script>
+  </head>
+<body>
+  
+<div>
+	<h1>Sample quiz</h1>
+	<div class="counter-box">Score: <span class="counter">0</span>/2</div>
+	
+	<fieldset>
+		<legend>Problem set 1</legend>
+		<div class="intro">Intro to problem set 1</div>
+		
+		<hr/>
+		<div>
+			<div class="description">How many legs does a dog have?</div>
+
+			
+			<div class="scq">
+				
+				<label>
+					<input type="radio" class="selection" name="question" autocomplete="off"/>
+					<span class="multiple-selection">1</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response wrong"></div>
+					
+					<br>
+				</label>
+				
+				<label>
+					<input type="radio" class="selection" name="question" autocomplete="off"/>
+					<span class="multiple-selection">2</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response wrong"></div>
+					
+					<br>
+				</label>
+				
+				<label>
+					<input type="radio" class="selection" name="question" autocomplete="off"/>
+					<span class="multiple-selection">3</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response wrong"></div>
+					
+					<br>
+				</label>
+				
+				<label>
+					<input type="radio" class="selection" name="question" autocomplete="off"/>
+					<span class="multiple-selection">4</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response right"></div>
+					
+					<br>
+				</label>
+				
+
+				<button>Submit</button>
+				<div class="response explanation">
+					<strong>Explanation</strong>
+					<br>
+					<p>Default question explanation</p>
+				</div>
+			</div>
+			
+		</div>
+		
+		<hr/>
+		<div>
+			<div class="description">Which of these drinks are served hot?</div>
+
+			
+			<div class="mcq">
+				
+				<label>
+					<input type="checkbox" autocomplete="off"/>
+					<span class="multiple-selection">Tea</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response right"></div>
+					
+				</label>
+				
+				<label>
+					<input type="checkbox" autocomplete="off"/>
+					<span class="multiple-selection">Coffee</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response right"></div>
+					
+				</label>
+				
+				<label>
+					<input type="checkbox" autocomplete="off"/>
+					<span class="multiple-selection">Lemonade</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response wrong"></div>
+					
+				</label>
+				
+				<label>
+					<input type="checkbox" autocomplete="off"/>
+					<span class="multiple-selection">Cola</span>
+					<span class="correct-checkbox">✓</span>
+					<span class="incorrect-checkbox">✗</span>
+					
+					<div class="response wrong"></div>
+					
+				</label>
+				
+
+				<button>Submit</button>
+				<div class="response explanation">
+					<strong>Explanation</strong>
+					<br>
+					<p>Default question explanation</p>
+				</div>
+			</div>
+			
+		</div>
+		
+	</fieldset>
+	<br/>
+	
+</div>
+
+</body>
+</html>
